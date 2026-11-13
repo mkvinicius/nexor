@@ -3,26 +3,21 @@ import {
   memo,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
-  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import { cn } from "@/lib/cn";
-import { CHROME_EYES, CHROME_GRADIENT, MAUS_COLORS, type MausColor, type MausMotion, type MausState } from "@/lib/mascot";
-import { CursorAvatar, type CursorAvatarHandle } from "./CursorAvatar";
-import { avatarCropRadius, botAvatarProfile, clampAvatarFocus, clampAvatarZoom, mascotFaceInk, type BotAvatarCrop, type MascotFaceColor } from "../../shared/bot-avatar";
-import { MASCOT_BODIES, botMascotBody } from "../../shared/mascot-bodies";
+import { type MausColor, type MausMotion, type MausState } from "@/lib/mascot";
+import { type CursorAvatarHandle } from "./CursorAvatar";
+import { avatarCropRadius, botAvatarProfile, clampAvatarFocus, clampAvatarZoom, type BotAvatarCrop, type MascotFaceColor } from "../../shared/bot-avatar";
 import { isCarvedBody, type BotBodyId } from "../../shared/bot-body";
 import { useFestivalDress, wornBody } from "@/lib/festival-dress";
 import { t } from "@/lib/i18n";
 import { CarvedAvatar } from "./CarvedAvatar";
-import { steelBodyImage } from "@/lib/steel-body";
+import { PlushAvatar } from "./PlushAvatar";
 
 export const EYE_SCALE = 1.12;
 export const MOUTH_WEIGHT = 11;
-
-const POINTER_GAZE = { forward: 1, authored: 0.25 };
 
 interface MotionFaces
   extends Partial<
@@ -45,25 +40,6 @@ const MOTION_FACE: MotionFaces = {
 };
 
 const MOTION_FACE_MS = 1400;
-
-function mix(hex: string, toward: string, t: number): string {
-  const a = Number.parseInt(hex.slice(1), 16);
-  const b = Number.parseInt(toward.slice(1), 16);
-  const channel = (shift: number) => {
-    const va = (a >> shift) & 0xff;
-    const vb = (b >> shift) & 0xff;
-    return Math.round(va + (vb - va) * t);
-  };
-  return `#${[channel(16), channel(8), channel(0)]
-    .map((part) => part.toString(16).padStart(2, "0"))
-    .join("")}`;
-}
-
-const gradientFor = (color: MausColor): [string, string, string] => {
-  if (color === "chrome") return CHROME_GRADIENT;
-  const fill = MAUS_COLORS[color] ?? MAUS_COLORS.green;
-  return [mix(fill, "#ffffff", 0.55), fill, mix(fill, "#000000", 0.42)];
-};
 
 export function roomAvatarGradient(color: MausColor): [string, string, string] {
   const fill = `var(--identity-${color})`;
@@ -123,91 +99,36 @@ function MausAvatarComponent(props: MausAvatarProps, ref: React.Ref<MausAvatarHa
 }
 
 function GradientAvatarComponent(
-  {
-    color,
-    state = "idle",
-    expression,
-    size = 44,
-    label,
-    motion = "none",
-    motionKey = 0,
-    turn,
-    gaze,
-    spring,
-    eyeScale,
-    showMouth,
-    mouthStroke,
-    forward = true,
-    lookAround,
-    trackPointer = true,
-    animated = true,
-    bodyId,
-    gradient,
-    faceColor,
-  }: MausAvatarProps,
+  { color, state = "idle", size = 44, label, motion = "none", motionKey = 0, animated = true }: MausAvatarProps,
   ref: React.Ref<MausAvatarHandle>,
 ) {
-  const silhouette = MASCOT_BODIES[botMascotBody(bodyId)];
-  const chrome = color === "chrome";
-  const faceInk = mascotFaceInk(faceColor);
-  const inner = useRef<CursorAvatarHandle>(null);
+  // The plush avatar draws its own face; the old blink/spin/setExpression handle stays as a no-op
+  // so the many call sites that reach for it keep working.
   useImperativeHandle(ref, () => ({
-    blink: () => inner.current?.blink(),
-    spin: (durationMs?: number) => inner.current?.spin(durationMs),
-    setExpression: (index: number) => inner.current?.setExpression(index),
+    blink: () => {},
+    spin: () => {},
+    setExpression: () => {},
   }));
 
   const [motionState, setMotionState] = useState<MausState | null>(null);
   useEffect(() => {
     if (motion === "none" || !animated) return;
     const beat = MOTION_FACE[motion];
-    if (!beat) return;
-    if (beat.blink) inner.current?.blink();
-    if (beat.spin) inner.current?.spin(beat.spin);
-    if (!beat.state) return;
+    if (!beat?.state) return;
     setMotionState(beat.state);
     const timer = setTimeout(() => setMotionState(null), MOTION_FACE_MS);
     return () => clearTimeout(timer);
   }, [motion, motionKey, animated]);
 
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  const range = forward ? POINTER_GAZE.forward : POINTER_GAZE.authored;
-  const onPointerMove = (event: ReactPointerEvent<HTMLSpanElement>) => {
-    if (!trackPointer || !animated) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    setPointer({
-      x: Math.max(-1, Math.min(1, ((event.clientX - rect.left) / rect.width) * 2 - 1)) * range,
-      y: Math.max(-1, Math.min(1, ((event.clientY - rect.top) / rect.height) * 2 - 1)) * range,
-    });
-  };
-  const onPointerLeave = () => setPointer({ x: 0, y: 0 });
-
   return (
-    <span
-      className="inline-flex shrink-0"
-      onPointerMove={trackPointer && animated ? onPointerMove : undefined}
-      onPointerLeave={trackPointer && animated ? onPointerLeave : undefined}
-    >
-      <CursorAvatar
-        ref={inner}
-        state={motionState ?? state}
-        expression={expression}
-        size={size}
-        silhouette={silhouette}
-        gradient={gradient ?? gradientFor(color)}
-        picture={chrome && !faceInk ? steelBodyImage(silhouette.id, size, globalThis.devicePixelRatio ?? 1) : null}
-        eyeColor={faceInk ?? (chrome ? CHROME_EYES : undefined)}
-        title={label ?? null}
-        lookAround={lookAround ?? (forward ? 0 : 1)}
-        gaze={{ x: (gaze?.x ?? 0) + pointer.x, y: (gaze?.y ?? 0) + pointer.y }}
-        turn={turn}
-        spring={spring}
-        eyeScale={eyeScale}
-        showMouth={showMouth}
-        mouthStroke={mouthStroke}
-        paused={!animated}
-      />
-    </span>
+    <PlushAvatar
+      seed={label ?? String(color)}
+      color={color}
+      size={size}
+      state={motionState ?? state}
+      animated={animated}
+      title={label}
+    />
   );
 }
 

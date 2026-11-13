@@ -14,8 +14,8 @@ export interface BoatOffer {
 export const BOAT_OFFER: BoatOffer = {
   url: "https://boat.dev",
   claimTo: "support@ascii.dev",
-  subject: "MausBot introduced me: $50 Boat credit",
-  body: "Hi Boat team,\n\nMausBot introduced me to Boat. I'm on the $___ plan.\nMy Boat account email: ___\n\nThanks!",
+  subject: "Nexor introduced me: $50 Boat credit",
+  body: "Hi Boat team,\n\nNexor introduced me to Boat. I'm on the $___ plan.\nMy Boat account email: ___\n\nThanks!",
   until: null,
 };
 

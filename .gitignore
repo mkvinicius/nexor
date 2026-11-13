@@ -42,3 +42,7 @@ deploy/podman/.env
 deploy/podman/.env.*
 !deploy/podman/.env.example
 /.env
+
+# Nexor rebrand: local build log and icon-pipeline backups
+branding/*.log
+*.orig

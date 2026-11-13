@@ -112,3 +112,15 @@ Teams' display-name rule. Copyright 2025-2026 Vexa.ai Inc. and the Vexa
 contributors, used under the Apache License, Version 2.0
 (third_party/vexa/LICENSE). The adapted parts were rewritten in our own code;
 no Vexa file is included unmodified.
+
+--------------------------------------------------------------------------------
+
+Nexor
+
+This distribution, "Nexor", is a rebranded, modified derivative of OpenMausBot
+(Copyright 2026 Milind Soni and OpenMausBot contributors), used under the Apache
+License, Version 2.0. Changes from the upstream project include the product
+name, application icons and branding, and felt-plush agent avatars that use the
+Bloub library (@norbert_bodziony/bloub, Copyright Jérémy Perret, used under the
+MIT License). All upstream copyright, license (LICENSE) and attribution (this
+NOTICE) material is retained as required by the Apache License, Version 2.0.

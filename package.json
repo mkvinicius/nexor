@@ -1,5 +1,6 @@
 {
-  "name": "openmausbot",
+  "name": "nexor",
+  "productName": "Nexor",
   "private": true,
   "version": "0.1.155",
   "description": "A local-first chat app for running a team of AI agents.",
@@ -13,7 +14,7 @@
     "email": "46266943+milind-soni@users.noreply.github.com"
   },
   "license": "Apache-2.0",
-  "desktopName": "com.openmausbot.app.desktop",
+  "desktopName": "com.nexor.app.desktop",
   "type": "module",
   "main": "electron/main.mjs",
   "engines": {
@@ -105,8 +106,10 @@
     "@hpke/core": "1.9.0",
     "@lezer/highlight": "1.2.5",
     "@muse-code/sdk": "1.4.6",
+    "@norbert_bodziony/bloub": "0.6.4",
     "@novnc/novnc": "1.7.0",
     "@resvg/resvg-js": "2.6.2",
+    "@solidjs/web": "2.0.0-rc.0",
     "@tanstack/react-virtual": "^3.14.13",
     "@trycua/cua-driver": "0.45.4",
     "ag-grid-community": "36.2.0",
@@ -136,6 +139,7 @@
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "shiki": "^4.4.3",
+    "solid-js": "2.0.0-rc.0",
     "sucrase": "3.35.1",
     "tailwind-merge": "^3.3.1",
     "tar": "7.5.22",

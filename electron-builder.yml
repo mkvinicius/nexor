@@ -1,10 +1,10 @@
-appId: com.openmausbot.app
-productName: OpenMausBot
-artifactName: OpenMausBot-${version}-${arch}.${ext}
+appId: com.nexor.app
+productName: Nexor
+artifactName: Nexor-${version}-${arch}.${ext}
 
 protocols:
-  - name: OpenMausBot package install
-    schemes: [openmausbot]
+  - name: Nexor package install
+    schemes: [nexor]
 
 # In-app auto-update reads latest-mac.yml + the .zip (macOS) or latest.yml +
 # the NSIS .exe (Windows) from the PUBLIC releases in this source repo.
@@ -15,8 +15,8 @@ protocols:
 # stranded on its installed version.
 publish:
   - provider: github
-    owner: milind-soni
-    repo: OpenMausBot
+    owner: nexor-app
+    repo: Nexor
 
 directories:
   buildResources: build
@@ -54,9 +54,9 @@ asar: true
 extraResources:
   # Ship the app's own license terms in every desktop distribution.
   - from: LICENSE
-    to: licenses/OpenMausBot-LICENSE.txt
+    to: licenses/Nexor-LICENSE.txt
   - from: NOTICE
-    to: licenses/OpenMausBot-NOTICE.txt
+    to: licenses/Nexor-NOTICE.txt
   # cloudflared is distributed under Apache-2.0 as a separate executable.
   # OpenMausBot itself uses the same full license text; ship another named
   # copy so the third-party executable's terms remain unambiguous.
@@ -197,11 +197,9 @@ win:
 nsis:
   oneClick: true
   perMachine: false
-  shortcutName: OpenMausBot
-  # Versioned, like the .dmg. The README's /latest/download/ button needs a
-  # STABLE filename, so ship a second copy named OpenMausBot-setup.exe on the
-  # release — the same trick as OpenMausBot.dmg beside OpenMausBot-${version}.dmg.
-  artifactName: OpenMausBot-${version}-setup.${ext}
+  shortcutName: Nexor
+  # Versioned stable filename for the installer download.
+  artifactName: Nexor-${version}-setup.${ext}
 
 linux:
   target:

@@ -1,0 +1,51 @@
+name: Build Nexor (macOS)
+
+# Manual trigger only — run it from the Actions tab when you want a fresh .dmg.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-mac:
+    runs-on: macos-14 # Apple Silicon (arm64)
+    timeout-minutes: 120
+    env:
+      # No Apple signing certificate in CI — build an unsigned app.
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      # The repo's pre-push/i18n hooks are a dev guard; CI just builds.
+      OMB_SKIP_HOOKS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build native prep + UI + server
+        run: pnpm package:prepare
+
+      - name: Build speech helper + CUA (macOS)
+        run: pnpm build:speech && pnpm build:cua
+
+      - name: Package unsigned .dmg (Apple Silicon)
+        run: pnpm exec electron-builder --mac dmg --arm64 --publish never
+
+      - name: Upload Nexor .dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nexor-macos-arm64-dmg
+          path: release/*.dmg
+          if-no-files-found: error

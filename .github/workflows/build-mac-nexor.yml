@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build-mac:
-    runs-on: macos-14 # Apple Silicon (arm64)
+    runs-on: macos-13 # Intel x64 — broadest availability; .dmg runs on Intel natively and on Apple Silicon via Rosetta 2
     timeout-minutes: 120
     env:
       # No Apple signing certificate in CI — build an unsigned app.
@@ -40,12 +40,12 @@ jobs:
       - name: Build speech helper + CUA (macOS)
         run: pnpm build:speech && pnpm build:cua
 
-      - name: Package unsigned .dmg (Apple Silicon)
-        run: pnpm exec electron-builder --mac dmg --arm64 --publish never
+      - name: Package unsigned .dmg (Intel x64, runs everywhere via Rosetta)
+        run: pnpm exec electron-builder --mac dmg --x64 --publish never
 
       - name: Upload Nexor .dmg
         uses: actions/upload-artifact@v4
         with:
-          name: Nexor-macos-arm64-dmg
+          name: Nexor-macos-x64-dmg
           path: release/*.dmg
           if-no-files-found: error

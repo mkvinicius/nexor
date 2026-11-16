@@ -2,7 +2,26 @@
 
 > **Para qualquer sessão (Claude Code, outra janela, ou a VPS):** leia este arquivo primeiro.
 > Ele contém o que é o projeto, tudo que já foi feito, onde paramos e o próximo passo exato.
-> **Última atualização:** 2026-11-14.
+> **Última atualização:** 2026-11-16 (no Mac).
+
+
+---
+
+## 0. ATUALIZAÇÃO 2026-11-16 (feita no Mac) — leia isto primeiro
+
+- **Nexor = 0.1.165** (merge do OpenMausBot 0.1.165, 898 commits). Commit do merge `9eea764c1`; main em `888e453e7`.
+- **Release `nexor-v0.1.165` publicada** com o Mac: `Nexor-0.1.165-arm64.dmg` (Apple Silicon) e `Nexor-0.1.165-x64.dmg` (Intel), mais os `.zip`, blockmaps e `latest-mac.yml` (atualização automática). Sem assinatura Apple (abrir com botão direito > Abrir na 1ª vez). **Abertura do app não foi testada** nesta sessão; o bundle (Nexor.app, com.nexor.app, arm64) foi conferido.
+- **Windows:** o `.exe` continua só na release 0.1.155. Para atualizar: no Windows, `git pull`, `pnpm install --frozen-lockfile`, `pnpm package:win`, e `gh release upload nexor-v0.1.165 release/Nexor-0.1.165-setup.exe release/latest.yml`.
+- **Correções:** o rebrand anterior renomeou CHAVES de tradução (`pair.thisOpenMausBot` → `pair.thisNexor` etc.) sem mudar o código, e esses textos saíam vazios. Agora as chaves são as do upstream e só os VALORES trocam "OpenMausBot/MausBot" por "Nexor". O `electron-builder.yml` apontava a atualização automática para `nexor-app/Nexor` (não existe); agora aponta para `mkvinicius/nexor`. O nome do `.dmg` era "OpenMausBot"; agora "Nexor".
+- **Clone no Mac:** `/Users/maikonviniciussilva/projetos/Nexor` (remoto `upstream` = OpenMausBot). Node arm64 em `/Users/maikonviniciussilva/projetos/Nexo/.nexo/isolated/tools/node/v24.22.2/bin` (com `corepack pnpm`; não há `pnpm` global, o `package:mac` precisa de um atalho `pnpm` no PATH).
+
+### Rotina para a próxima versão do OpenMausBot
+1. `git fetch upstream main && git merge upstream/main`.
+2. Conflitos esperados: `src/locales/*.json` → pegar a versão do upstream e trocar `OpenMausBot`/`MausBot` → `Nexor` **só nos valores** (nunca nas chaves); `README.md` → manter o do Nexor; `src/components/Avatar.tsx` → manter o `PlushAvatar`; `electron-builder.yml` → conferir `dmg.artifactName`, `publish` e os `NS*UsageDescription`.
+3. `corepack pnpm install --frozen-lockfile`, `corepack pnpm typecheck`, `corepack pnpm lint`.
+4. Hashes das traduções: o `--check` reclama "English source changed" para as chaves com a marca; re-registrar o hash dessas chaves em `src/locales/source-hashes.json` com o sha256 do inglês atual (só as que contêm "Nexor"). Guardas: `src/locales/vocabulary.test.ts` (allow-list com "Nexor introduced me").
+5. Build: `CSC_IDENTITY_AUTO_DISCOVERY=false OMB_SKIP_HOOKS=1 pnpm package:mac` (15–25 min) → `release/`.
+6. `git push`; `gh release create nexor-v<versão> release/Nexor-*.dmg release/Nexor-*.zip release/*.blockmap release/latest-mac.yml -R mkvinicius/nexor`.
 
 ---
 
@@ -11,7 +30,7 @@
 **Nexor** = app local-first de chat multi-agente (alternativa open-source ao "Grok Bot"), onde **cada bot é um agente de IA real** (Claude / Codex / Grok) rodando por baixo.
 
 - É um **rebrand** do projeto open-source **OpenMausBot** (autor Milind Soni, Apache-2.0), clonado de https://github.com/milind-soni/OpenMausBot.
-- Versão: **0.1.155**.
+- Versão: **0.1.165** (era 0.1.155 até 2026-11-16).
 - Stack: **TypeScript + React 19 + Vite + Electron**, monorepo **pnpm** (`pnpm@10.33.0`), engine **Node ≥ 24**.
 - Repositório do usuário (**público**): https://github.com/mkvinicius/nexor (conta `mkvinicius`, plano free).
 - Pasta local (Windows): `C:\Users\USER\OpenMausBot`

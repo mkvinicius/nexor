@@ -66,6 +66,36 @@ Fluxo completo do Mac:
 
 ---
 
+## 4B. 🍎 PLANO B — GERAR O .DMG NO MAC DE CASA (jeito mais fácil)
+
+> O usuário **tem um Mac em casa**. Quando estiver nele, este é o caminho certo (não depende da fila do GitHub).
+
+**Jeito 1 — via Claude Code no Mac (recomendado p/ o usuário não-técnico):**
+Abrir o Claude Code na pasta do projeto no Mac e dizer:
+> *"Leia o CONTINUAR-AQUI.md e gere o instalador .dmg do Mac."*
+
+O Claude Code deve então: clonar/atualizar o repo, rodar `bash branding/build-mac.sh`, e publicar o `.dmg` na release.
+
+**Jeito 2 — um comando só no Terminal do Mac:**
+```bash
+# 1. Pegar o projeto (só na 1ª vez; depois é só 'git pull')
+git clone https://github.com/mkvinicius/nexor.git
+cd nexor
+# 2. Rodar o script que faz TUDO (instala, compila, empacota e publica o .dmg)
+bash branding/build-mac.sh
+```
+
+O script `branding/build-mac.sh`:
+1. Garante o pnpm 10.33.0 (precisa de **Node 24+** já instalado — se não tiver: `brew install node`).
+2. Instala dependências.
+3. Compila e empacota o `.dmg` **unsigned** (`CSC_IDENTITY_AUTO_DISCOVERY=false`).
+4. Mostra o `.dmg` em `release/`.
+5. Se o `gh` estiver logado no Mac, **já publica** na release `nexor-v0.1.155`. Se não, mostra o comando pra publicar.
+
+> Observação: o `.dmg` sai **sem assinatura Apple**. Ao abrir no Mac, o macOS mostra "app não verificado" → o usuário clica com o **botão direito no app → Abrir → Abrir** (só na 1ª vez). Pra remover esse aviso de vez, precisa de conta Apple Developer (US$99/ano) — pendência futura.
+
+---
+
 ## 5. Como RETOMAR em outra máquina / VPS
 
 ```bash

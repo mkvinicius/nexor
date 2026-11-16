@@ -59,3 +59,7 @@ deploy/fly/*.caddy text eol=lf
 # through vitest: Vite's transform (vitest 4.1.11) fails with "Invalid or unexpected token" on a file that starts
 # with a shebang and has CRLF line endings, which is what a Windows checkout made of it.
 skills/** text eol=lf
+
+# Nexor Plan B: this script is written on Windows but RUN on a Mac via `bash`; a CRLF
+# shebang is "/usr/bin/env bash^M: bad interpreter" there. Pin it to LF on every platform.
+branding/build-mac.sh text eol=lf

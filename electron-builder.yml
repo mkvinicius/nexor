@@ -15,8 +15,8 @@ protocols:
 # stranded on its installed version.
 publish:
   - provider: github
-    owner: nexor-app
-    repo: Nexor
+    owner: mkvinicius
+    repo: nexor
 
 directories:
   buildResources: build
@@ -133,9 +133,9 @@ mac:
     - from: dist-native/duckdb/darwin-${arch}/node_modules
       to: duckdb/node_modules
   extendInfo:
-    NSMicrophoneUsageDescription: OpenMausBot uses the microphone for voice dictation into the composer.
-    NSSpeechRecognitionUsageDescription: OpenMausBot transcribes your voice on-device to type messages for you.
-    NSAccessibilityUsageDescription: OpenMausBot uses Accessibility when you let a bot control this Mac.
+    NSMicrophoneUsageDescription: Nexor uses the microphone for voice dictation into the composer.
+    NSSpeechRecognitionUsageDescription: Nexor transcribes your voice on-device to type messages for you.
+    NSAccessibilityUsageDescription: Nexor uses Accessibility when you let a bot control this Mac.
     NSLocalNetworkUsageDescription: OpenMausBot connects to your phones and your other computers on this network and on Tailscale.
     NSBonjourServices:
       - _openmausbot._tcp
@@ -150,7 +150,7 @@ dmg:
   # ${arch} is load-bearing: without it the x64 dmg silently overwrites
   # the arm64 one when both arches build (this section overrides both the
   # top-level and mac-level artifactName, so it must carry the arch itself)
-  artifactName: OpenMausBot-${version}-${arch}.dmg
+  artifactName: Nexor-${version}-${arch}.dmg
   # x/y are icon centres in points. electron-builder 26.15.3 sizes the window
   # from build/background.png and ignores dmg.window whenever a background is set.
   iconSize: 112

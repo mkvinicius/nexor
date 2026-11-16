@@ -196,7 +196,7 @@ describe("Settings → Engines → setup cards", () => {
     const account = (instanceId: string, authenticated: boolean, signOut: boolean): InstanceInfo => ({
       instanceId, driverKind: "antigravityAgent", displayName: "Google account", cliDefault: "agy_acp_server",
       snapshot: { state: "available", authenticated }, models: { default: "gemini", options: [] },
-      authentication: { method: "browser", signOut },
+      authentication: { method: "callback-url", signOut },
     });
     fixture.instances = [account("antigravity", true, true)];
     expect(renderToStaticMarkup(createElement(EnginesSettings))).toContain(">Sign out<");
@@ -310,7 +310,7 @@ describe("Settings → Engines → setup cards", () => {
 
     vi.stubGlobal("window", { ogb: { remoteClient: { active: true } } });
     const remote = renderToStaticMarkup(createElement(EnginesSettings));
-    expect(remote).toContain("open Settings → API keys on the computer running MausBot");
+    expect(remote).toContain("open Settings → AI on the computer running MausBot");
     expect(remote).not.toContain("data-key-row");
 
     vi.stubGlobal("window", {});

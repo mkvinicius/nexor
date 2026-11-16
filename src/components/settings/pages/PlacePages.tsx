@@ -4,11 +4,12 @@ import { t } from "@/lib/i18n";
 import { productName } from "@/lib/brand";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { useStore } from "@/state/store";
+import { useTeamPeople } from "@/state/team-people";
 import { AdminOnly } from "../../AdminOnly";
 import { AutomaticRecoverySettings } from "../../AutomaticRecoverySettings";
 import { AwayEmailsSetting } from "../../AwayEmailsSetting";
 import { PausedBotsButton } from "../../AwakeBotsPicker";
-import { BuiltInBrowserRow, NewBrowserSettings, ServerSitesRow } from "../../BrowserSettingsRows";
+import { BrowserProxyRow, BuiltInBrowserRow, NewBrowserSettings, ServerSitesRow } from "../../BrowserSettingsRows";
 import { CacheKeepWarmSettings } from "../../CacheKeepWarmSettings";
 import { TeamPeopleCard } from "../../CloudAccountSettings";
 import { CloudKeepHere } from "../../CloudKeepHere";
@@ -68,6 +69,7 @@ export function OverviewPage() {
   const [note, dismiss] = useGroupedNote();
   const phone = usePhonePlaceState(!ctx.client);
   const team = state.config?.team;
+  const teamOwner = useTeamPeople()?.me?.role === "owner";
   const phoneValue = phone.kind === "paired" || phone.kind === "attention" ? t("settings.glance.phonePaired", { count: phone.count })
     : phone.kind === "none" ? t("settings.glance.notSetUp") : undefined;
   const engines = state.instances.filter((instance) => instance.snapshot.state === "available").length;
@@ -96,7 +98,7 @@ export function OverviewPage() {
     <SettingsGroup label={t("settings.overview.sidebar")} block="sidebar">
       <SettingsRows><PlaceLookRows /><DefaultBotSidebarRow simple /></SettingsRows>
     </SettingsGroup>
-    {ctx.desktop && ctx.cloud && team && team.cloudPage && <div data-settings-block="people-and-plan"><TeamPeopleCard team={team} /></div>}
+    {ctx.desktop && ctx.cloud && team && team.cloudPage && <div data-settings-block="people-and-plan"><TeamPeopleCard team={team} admin={ctx.admin} owner={teamOwner} /></div>}
     {/* Address: a self-hosted server's own web address, Advanced only. A Cloud's address is MausBot's to manage, so it
         has none here (no administrator or proxy steps for a person who has no server to set up). */}
     {place.kind === "server" && !ctx.client && ctx.advanced && <CustomDomainSettings />}
@@ -180,7 +182,7 @@ export function DesktopsPage() {
   const [details, setDetails] = useState(anchor === "desktop-details");
   return <>
     <SettingsGroup label={t("settings.desktops.browserSection")} block="browser">
-      <SettingsRows><BuiltInBrowserRow /><ServerSitesRow />{ctx.advanced && <div data-settings-block="new-browser" className="contents"><NewBrowserSettings /></div>}</SettingsRows>
+      <SettingsRows><BuiltInBrowserRow /><ServerSitesRow /><BrowserProxyRow />{ctx.advanced && <div data-settings-block="new-browser" className="contents"><NewBrowserSettings /></div>}</SettingsRows>
     </SettingsGroup>
     <AdminOnly><DesktopKinds /></AdminOnly>
     <BrowserProfilesRow />

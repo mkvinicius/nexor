@@ -30,7 +30,7 @@ import { parse as parseYaml } from "yaml";
 
 import type { ModelCatalog } from "../../contracts.ts";
 import { harnessHome } from "../../env-path.ts";
-import { resolveCli, spawnCli } from "../../procs.ts";
+import { killCliTree, resolveCli, spawnCli } from "../../procs.ts";
 import { createAcpDriver, type AcpSupport } from "./core.ts";
 import { acpVariantOption } from "./config-options.ts";
 
@@ -201,7 +201,7 @@ export function fetchDeepSeekCatalog(
     try {
       // Security: while the bot box is on, dsh runs in it, as a bot's turn does: it reads ~/.dsh, which a bot can write.
       const resolved = resolveCli(cli, ["--profile", "acp"], env as NodeJS.ProcessEnv);
-      child = spawnCli(resolved.command, resolved.args, { stdio: ["pipe", "pipe", "ignore"], env: env as NodeJS.ProcessEnv, box: { allowEnv } });
+      child = spawnCli(resolved.command, resolved.args, { stdio: ["pipe", "pipe", "ignore"], env: { ...env, ...resolved.env }, box: { allowEnv } });
     } catch (error) {
       return reject(error instanceof Error ? error : new Error(String(error)));
     }
@@ -214,16 +214,8 @@ export function fetchDeepSeekCatalog(
       try {
         child.stdin?.end();
       } catch {}
-      try {
-        if (child.kill()) {
-          const hardKill = setTimeout(() => {
-            try {
-              child.kill("SIGKILL");
-            } catch {}
-          }, 1_000);
-          hardKill.unref?.();
-        }
-      } catch {}
+      // dsh's own children (its MCP servers) go too: spawnCli started it in a group of its own.
+      void killCliTree(child, 1_000);
       if ("catalog" in outcome) resolve(outcome.catalog);
       else reject(outcome.error);
     };
@@ -317,7 +309,7 @@ export const deepseekSupport: AcpSupport = {
   models: DEEPSEEK_MODELS,
   defaultCli: "dsh",
   nativeSource: "deepseek.acp",
-  loginNote: "DeepSeek Harness has no DeepSeek API key — paste one under Settings → Connections → Model providers, or set DEEPSEEK_API_KEY",
+  loginNote: "DeepSeek Harness has no DeepSeek API key — paste one under Settings → AI → Providers, or set DEEPSEEK_API_KEY",
 
   install: {
     command: {

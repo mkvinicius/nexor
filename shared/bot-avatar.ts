@@ -21,6 +21,24 @@ export function avatarColorHex(value: unknown): string | undefined {
 }
 
 /**
+ * A closed list of lucide-react icon names that may stand in as a bot's avatar
+ * glyph (coloured with the resolved avatar colour). Kept closed so a persisted
+ * profile can never name an arbitrary, unbundled component; every name here is
+ * confirmed to exist in the installed lucide-react. Precedence: photo > icon >
+ * mascot.
+ */
+export const BOT_AVATAR_ICONS = [
+  "Sparkles", "Bot", "Star", "Zap", "Heart", "Rocket", "Bell", "Cloud",
+  "Compass", "Flame", "Ghost", "Gift", "Globe", "Leaf", "Moon", "Sun",
+  "Music", "Palette", "PawPrint", "Smile", "Crown", "Diamond", "Feather",
+  "Flower", "Coffee", "Camera", "Code", "Cpu", "Database", "Gamepad2",
+  "Headphones", "Wand2", "Brain", "Atom", "Anchor", "Bird", "Cat", "Dog",
+  "Fish",
+] as const;
+export const avatarIconSchema = z.enum(BOT_AVATAR_ICONS);
+export type BotAvatarIcon = z.infer<typeof avatarIconSchema>;
+
+/**
  * `mascot` draws the animated mascot body, filled with the bot's colour
  * gradient. `circle`, `rounded`, and `square` crop the bot's own image
  * instead, shown as it is, with no mascot at all.

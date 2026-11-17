@@ -286,6 +286,7 @@ export interface Bot extends DefaultBotFields, Pick<WireBot, "mascotFaceColor" |
   notifications: boolean;
   color: MausColor;
   avatarColor?: string | null;
+  avatarIcon?: string | null;
   mascotExpression?: string | null;
   mascotBody?: BotBodyId | null;
   avatarUrl?: string | null;

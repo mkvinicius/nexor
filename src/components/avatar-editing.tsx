@@ -17,10 +17,10 @@ import { BotAvatar } from "./Avatar";
 import { useBotEditor } from "./bot-settings/BotEditorContext";
 
 export type AvatarPatch = Partial<
-  Pick<Bot, "avatarCrop" | "avatarUrl" | "avatarZoom" | "avatarFocusX" | "avatarFocusY" | "color" | "avatarColor" | "mascotExpression" | "mascotBody" | "mascotFaceColor">
+  Pick<Bot, "avatarCrop" | "avatarUrl" | "avatarZoom" | "avatarFocusX" | "avatarFocusY" | "color" | "avatarColor" | "avatarIcon" | "mascotExpression" | "mascotBody" | "mascotFaceColor">
 >;
 
-export const RESET_MASCOT_PATCH: AvatarPatch = { avatarCrop: "mascot", color: "green", avatarColor: null, mascotExpression: null, mascotBody: "cursor", mascotFaceColor: null };
+export const RESET_MASCOT_PATCH: AvatarPatch = { avatarCrop: "mascot", color: "green", avatarColor: null, avatarIcon: null, mascotExpression: null, mascotBody: "cursor", mascotFaceColor: null };
 
 export const CROP_LABEL = {
   mascot: "Mascot",

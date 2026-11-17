@@ -9,10 +9,12 @@ import {
 import { cn } from "@/lib/cn";
 import { type MausColor, type MausMotion, type MausState } from "@/lib/mascot";
 import { type CursorAvatarHandle } from "./CursorAvatar";
-import { avatarCropRadius, botAvatarProfile, clampAvatarFocus, clampAvatarZoom, type BotAvatarCrop, type MascotFaceColor } from "../../shared/bot-avatar";
+import { avatarColorHex, avatarCropRadius, botAvatarProfile, clampAvatarFocus, clampAvatarZoom, type BotAvatarCrop, type MascotFaceColor } from "../../shared/bot-avatar";
 import { isCarvedBody, type BotBodyId } from "../../shared/bot-body";
 import { useFestivalDress, wornBody } from "@/lib/festival-dress";
 import { t } from "@/lib/i18n";
+import { avatarIconComponent } from "@/lib/avatar-icons";
+import { bloubColor } from "@/lib/bloub-profile";
 import { CarvedAvatar } from "./CarvedAvatar";
 import { PlushAvatar } from "./PlushAvatar";
 
@@ -146,6 +148,7 @@ export type BotAvatarProps = Omit<MausAvatarProps, "color" | "gradient"> & {
     name?: string;
     color: MausColor;
     avatarColor?: string | null;
+    avatarIcon?: string | null;
     avatarUrl?: string | null;
     avatarCrop?: BotAvatarCrop;
     avatarZoom?: number;
@@ -156,19 +159,21 @@ export type BotAvatarProps = Omit<MausAvatarProps, "color" | "gradient"> & {
   };
 };
 
-export type BotAvatarOutcome = "flatImage" | "gradientMascot";
+export type BotAvatarOutcome = "flatImage" | "icon" | "gradientMascot";
 
-/** Mirrored name for name by resolveBotAvatarOutcome in ios/Sources/CompanionCore/BotAvatarRendering.swift. */
+/** Mirrored name for name by resolveBotAvatarOutcome in ios/Sources/CompanionCore/BotAvatarRendering.swift.
+ * TODO(iOS parity): mirror 'icon' outcome. */
 export function resolveBotAvatarOutcome(params: {
   avatarCrop: BotAvatarCrop;
   hasUrl: boolean;
   imageFailed: boolean;
+  hasIcon: boolean;
 }): BotAvatarOutcome {
-  const { avatarCrop, hasUrl, imageFailed } = params;
-  if (!hasUrl) return "gradientMascot";
-  if (avatarCrop === "mascot") return "gradientMascot";
-  if (imageFailed) return "gradientMascot";
-  return "flatImage";
+  const { avatarCrop, hasUrl, imageFailed, hasIcon } = params;
+  // Precedence: photo > icon > mascot.
+  if (hasUrl && avatarCrop !== "mascot" && !imageFailed) return "flatImage";
+  if (hasIcon) return "icon";
+  return "gradientMascot";
 }
 
 export function BotAvatar({ bot, size = 44, label, readable = false, ...mascotProps }: BotAvatarProps) {
@@ -178,11 +183,26 @@ export function BotAvatar({ bot, size = 44, label, readable = false, ...mascotPr
 
   useEffect(() => setImageFailed(false), [profile.avatarUrl]);
 
+  const IconComponent = avatarIconComponent(bot.avatarIcon);
   const outcome = resolveBotAvatarOutcome({
     avatarCrop: profile.avatarCrop,
     hasUrl: Boolean(profile.avatarUrl),
     imageFailed,
+    hasIcon: Boolean(IconComponent),
   });
+
+  if (outcome === "icon" && IconComponent) {
+    const color = avatarColorHex(bot.avatarColor) ?? bloubColor(bot.color);
+    return (
+      <span
+        className="relative flex shrink-0 items-center justify-center overflow-hidden"
+        style={{ width: size, height: size, borderRadius: "50%" }}
+        aria-label={label ?? (bot.name ? t("avatar.alt", { name: bot.name }) : t("avatar.altFallback"))}
+      >
+        <IconComponent size={Math.round(size * 0.58)} color={color} absoluteStrokeWidth />
+      </span>
+    );
+  }
 
   if (outcome !== "flatImage") {
     return (

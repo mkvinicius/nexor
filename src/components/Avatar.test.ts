@@ -117,25 +117,44 @@ describe("resolveBotAvatarOutcome", () => {
   // function.
   it("falls back to the gradient mascot for an image that failed to load", () => {
     expect(
-      resolveBotAvatarOutcome({ avatarCrop: "circle", hasUrl: true, imageFailed: true }),
+      resolveBotAvatarOutcome({ avatarCrop: "circle", hasUrl: true, imageFailed: true, hasIcon: false }),
     ).toBe("gradientMascot");
   });
 
   it("renders a good flat image flat", () => {
     expect(
-      resolveBotAvatarOutcome({ avatarCrop: "rounded", hasUrl: true, imageFailed: false }),
+      resolveBotAvatarOutcome({ avatarCrop: "rounded", hasUrl: true, imageFailed: false, hasIcon: false }),
     ).toBe("flatImage");
   });
 
   it("keeps the mascot crop on the gradient mascot even with a loaded image", () => {
     expect(
-      resolveBotAvatarOutcome({ avatarCrop: "mascot", hasUrl: true, imageFailed: false }),
+      resolveBotAvatarOutcome({ avatarCrop: "mascot", hasUrl: true, imageFailed: false, hasIcon: false }),
     ).toBe("gradientMascot");
   });
 
   it("falls back to the gradient mascot when there is no image at all", () => {
     expect(
-      resolveBotAvatarOutcome({ avatarCrop: "square", hasUrl: false, imageFailed: false }),
+      resolveBotAvatarOutcome({ avatarCrop: "square", hasUrl: false, imageFailed: false, hasIcon: false }),
     ).toBe("gradientMascot");
+  });
+
+  // Precedence: photo > icon > mascot.
+  it("prefers a good flat image over an icon", () => {
+    expect(
+      resolveBotAvatarOutcome({ avatarCrop: "circle", hasUrl: true, imageFailed: false, hasIcon: true }),
+    ).toBe("flatImage");
+  });
+
+  it("uses the icon over the mascot when there is no usable image", () => {
+    expect(
+      resolveBotAvatarOutcome({ avatarCrop: "mascot", hasUrl: false, imageFailed: false, hasIcon: true }),
+    ).toBe("icon");
+  });
+
+  it("uses the icon when a flat image failed to load", () => {
+    expect(
+      resolveBotAvatarOutcome({ avatarCrop: "circle", hasUrl: true, imageFailed: true, hasIcon: true }),
+    ).toBe("icon");
   });
 });

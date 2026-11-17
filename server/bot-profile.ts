@@ -4,6 +4,7 @@ import {
   AVATAR_ZOOM_MAX,
   AVATAR_ZOOM_MIN,
   avatarColorSchema,
+  avatarIconSchema,
   BOT_AVATAR_CROPS,
   botAvatarCropSchema,
   botAvatarUrlSchema,
@@ -31,6 +32,7 @@ export const BOT_PROFILE_PATCH_FIELDS = [
   "mascotBody",
   "mascotFaceColor",
   "avatarColor",
+  "avatarIcon",
   "voice",
   "speakReplies",
   "replyStyle",
@@ -71,6 +73,7 @@ export const profilePatchSchema = z.object({
   mascotBody: botBodySchema.optional(),
   mascotFaceColor: mascotFaceColorSchema.nullable().optional(),
   avatarColor: avatarColorSchema.nullable().optional(),
+  avatarIcon: avatarIconSchema.nullable().optional(),
   voice: z
     .string({ error: "voice must be a string" })
     .max(BOT_PROFILE_LIMITS.voice, { error: "voice must be at most 200 characters" })
@@ -97,6 +100,7 @@ export type BotProfilePatch = Partial<
     | "mascotBody"
     | "mascotFaceColor"
     | "avatarColor"
+    | "avatarIcon"
     | "voice"
     | "speakReplies"
     | "replyStyle"
@@ -130,6 +134,9 @@ export function parseBotProfilePatch(input: BotProfilePatchInput, strict = false
     }
     if (issue?.path[0] === "avatarColor") {
       return { ok: false, error: "avatarColor must be a #rrggbb hex colour or null" };
+    }
+    if (issue?.path[0] === "avatarIcon") {
+      return { ok: false, error: "avatarIcon must be one of the built-in icon names or null" };
     }
     return { ok: false, error: issue?.message ?? "invalid profile patch" };
   }

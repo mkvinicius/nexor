@@ -10,7 +10,8 @@ import {
   type MausMotion,
   type MausState,
 } from "@/lib/mascot";
-import { BOT_AVATAR_CROPS } from "../../shared/bot-avatar";
+import { BOT_AVATAR_CROPS, BOT_AVATAR_ICONS } from "../../shared/bot-avatar";
+import { avatarIconComponent } from "@/lib/avatar-icons";
 import { MASCOT_BODY_IDS } from "../../shared/mascot-bodies";
 import { FESTIVAL_IDS, FESTIVALS, type BotBodyId } from "../../shared/bot-body";
 import { BotAvatar, MausAvatar } from "./Avatar";
@@ -191,6 +192,47 @@ export function BotProfileAvatarCard({
                   Clear
                 </button>
               )}
+            </div>
+
+            <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+              Icon
+            </div>
+            <div className="grid grid-cols-8 gap-1.5">
+              <button
+                type="button"
+                disabled={busy}
+                aria-pressed={!bot.avatarIcon}
+                onClick={() => onPatch({ avatarIcon: null })}
+                title="None"
+                aria-label="No icon"
+                className={cn(
+                  "flex h-10 items-center justify-center rounded-lg text-[11px] disabled:opacity-50",
+                  !bot.avatarIcon ? "bg-control text-ink ring-2 ring-accent-border" : "text-ink-secondary hover:bg-control/60 hover:text-ink",
+                )}
+              >
+                None
+              </button>
+              {BOT_AVATAR_ICONS.map((name) => {
+                const Icon = avatarIconComponent(name);
+                const selected = bot.avatarIcon === name;
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    disabled={busy}
+                    aria-pressed={selected}
+                    onClick={() => onPatch({ avatarIcon: name, avatarCrop: "mascot", avatarUrl: null })}
+                    title={name}
+                    aria-label={name}
+                    className={cn(
+                      "flex h-10 items-center justify-center rounded-lg disabled:opacity-50",
+                      selected ? "bg-control text-ink ring-2 ring-accent-border" : "text-ink-secondary hover:bg-control/60 hover:text-ink",
+                    )}
+                  >
+                    {Icon ? <Icon size={20} /> : null}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">

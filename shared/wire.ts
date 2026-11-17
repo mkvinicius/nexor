@@ -286,6 +286,8 @@ export interface WireBot extends DefaultBotFields, BotAccessFields {
   mascotFaceColor?: MascotFaceColor | null;
   /** Custom `#rrggbb` avatar colour. Present and valid overrides the hex from `color`; absent/null falls back to the enum. */
   avatarColor?: string | null;
+  /** A lucide icon name (from BOT_AVATAR_ICONS) shown as the avatar glyph, coloured with the resolved colour. Precedence: photo > icon > mascot. */
+  avatarIcon?: string | null;
   /** App-owned attachment served as this bot's custom profile image;
    * always present on the wire, null when the bot has none. */
   avatarUrl: string | null;

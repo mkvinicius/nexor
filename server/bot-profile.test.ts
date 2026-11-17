@@ -155,6 +155,20 @@ describe("avatarColor", () => {
   });
 });
 
+describe("avatarIcon", () => {
+  it.each(["Sparkles", null] as const)("accepts %j at both profile boundaries", (avatarIcon) => {
+    for (const strict of [true, false]) {
+      expect(parseBotProfilePatch({ avatarIcon }, strict)).toEqual({ ok: true, patch: { avatarIcon } });
+    }
+  });
+
+  it.each(["NotARealIcon", "sparkles", "", 1, {}, []])("rejects an unsupported icon %j", (avatarIcon) => {
+    expect(parseBotProfilePatch({ avatarIcon } as never, true)).toEqual({
+      ok: false, error: "avatarIcon must be one of the built-in icon names or null",
+    });
+  });
+});
+
 describe("soul (standing instructions)", () => {
   it("accepts soul on both the strict and broad boundaries", () => {
     expect(parseBotProfilePatch({ soul: "Be brief." }, true)).toEqual({ ok: true, patch: { soul: "Be brief." } });

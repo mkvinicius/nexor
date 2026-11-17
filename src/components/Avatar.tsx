@@ -73,6 +73,8 @@ export type MausAvatarProps = {
   bodyId?: BotBodyId;
   gradient?: [string, string, string];
   faceColor?: MascotFaceColor | null;
+  /** Custom `#rrggbb` colour overriding the hex derived from `color`. */
+  avatarColor?: string | null;
 };
 
 function MausAvatarComponent(props: MausAvatarProps, ref: React.Ref<MausAvatarHandle>) {
@@ -83,6 +85,7 @@ function MausAvatarComponent(props: MausAvatarProps, ref: React.Ref<MausAvatarHa
         ref={ref}
         body={bodyId}
         color={color}
+        avatarColor={props.avatarColor}
         faceColor={props.faceColor}
         size={size}
         state={state}
@@ -99,7 +102,7 @@ function MausAvatarComponent(props: MausAvatarProps, ref: React.Ref<MausAvatarHa
 }
 
 function GradientAvatarComponent(
-  { color, state = "idle", size = 44, label, motion = "none", motionKey = 0, animated = true }: MausAvatarProps,
+  { color, avatarColor, state = "idle", size = 44, label, motion = "none", motionKey = 0, animated = true }: MausAvatarProps,
   ref: React.Ref<MausAvatarHandle>,
 ) {
   // The plush avatar draws its own face; the old blink/spin/setExpression handle stays as a no-op
@@ -124,6 +127,7 @@ function GradientAvatarComponent(
     <PlushAvatar
       seed={label ?? String(color)}
       color={color}
+      avatarColor={avatarColor}
       size={size}
       state={motionState ?? state}
       animated={animated}
@@ -141,6 +145,7 @@ export type BotAvatarProps = Omit<MausAvatarProps, "color" | "gradient"> & {
   bot: {
     name?: string;
     color: MausColor;
+    avatarColor?: string | null;
     avatarUrl?: string | null;
     avatarCrop?: BotAvatarCrop;
     avatarZoom?: number;
@@ -185,6 +190,7 @@ export function BotAvatar({ bot, size = 44, label, readable = false, ...mascotPr
         bodyId={wornBody(bot.mascotBody, bot.color, festival)}
         {...mascotProps}
         color={bot.color}
+        avatarColor={bot.avatarColor}
         faceColor={bot.mascotFaceColor}
         gradient={readable ? roomAvatarGradient(bot.color) : undefined}
         size={size}

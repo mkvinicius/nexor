@@ -137,6 +137,24 @@ describe("mascotFaceColor", () => {
   });
 });
 
+describe("avatarColor", () => {
+  it.each(["#aabbcc", null] as const)("accepts %j at both profile boundaries", (avatarColor) => {
+    for (const strict of [true, false]) {
+      expect(parseBotProfilePatch({ avatarColor }, strict)).toEqual({ ok: true, patch: { avatarColor } });
+    }
+  });
+
+  it("accepts an uppercase hex (render normalizes the case)", () => {
+    expect(parseBotProfilePatch({ avatarColor: "#AABBCC" }, true)).toEqual({ ok: true, patch: { avatarColor: "#AABBCC" } });
+  });
+
+  it.each(["aabbcc", "#abc", "#gghhii", "red", "", 1, {}, []])("rejects an unsupported colour %j", (avatarColor) => {
+    expect(parseBotProfilePatch({ avatarColor } as never, true)).toEqual({
+      ok: false, error: "avatarColor must be a #rrggbb hex colour or null",
+    });
+  });
+});
+
 describe("soul (standing instructions)", () => {
   it("accepts soul on both the strict and broad boundaries", () => {
     expect(parseBotProfilePatch({ soul: "Be brief." }, true)).toEqual({ ok: true, patch: { soul: "Be brief." } });

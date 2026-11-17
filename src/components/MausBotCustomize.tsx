@@ -43,21 +43,44 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
       </label>
       <div>
         <span className={LABEL}>{t("onboarding.bot.color")}</span>
-        <div role="radiogroup" aria-label={t("onboarding.bot.color")} className="mt-1.5 flex flex-wrap gap-1.5">
+        <div role="radiogroup" aria-label={t("onboarding.bot.color")} className="mt-1.5 flex flex-wrap items-center gap-1.5">
           {MAUS_COLOR_NAMES.map((color) => (
             <button
               key={color}
               type="button"
               role="radio"
-              aria-checked={!picture && preview.color === color}
+              aria-checked={!picture && !preview.avatarColor && preview.color === color}
               aria-label={t(MAUS_COLOR_LABEL[color])}
               title={t(MAUS_COLOR_LABEL[color])}
               data-mausbot-welcome-color={color}
-              onClick={() => shape({ color })}
-              className={cn("size-6 rounded-full border-2 transition-transform hover:scale-110", !picture && preview.color === color ? "border-ink" : "border-transparent")}
+              onClick={() => shape({ color, avatarColor: null })}
+              className={cn("size-6 rounded-full border-2 transition-transform hover:scale-110", !picture && !preview.avatarColor && preview.color === color ? "border-ink" : "border-transparent")}
               style={{ background: colorSwatch(color) }}
             />
           ))}
+          <label
+            className={cn("relative size-6 cursor-pointer rounded-full border-2 transition-transform hover:scale-110", preview.avatarColor ? "border-ink" : "border-transparent")}
+            style={{ background: preview.avatarColor ?? "conic-gradient(red, orange, yellow, lime, cyan, blue, magenta, red)" }}
+            title="Custom"
+            aria-label="Custom colour"
+          >
+            <input
+              type="color"
+              value={preview.avatarColor ?? "#888888"}
+              onChange={(event) => shape({ avatarColor: event.target.value })}
+              className="absolute inset-0 size-full cursor-pointer opacity-0"
+            />
+          </label>
+          {preview.avatarColor && (
+            <button
+              type="button"
+              onClick={() => shape({ avatarColor: null })}
+              aria-label="Clear custom colour"
+              className="rounded-md px-1.5 py-0.5 text-[12px] text-ink-secondary hover:bg-ink/[0.05] hover:text-ink"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
       <div>
@@ -74,7 +97,7 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
               onClick={() => shape({ mascotBody: id })}
               className={cn("flex h-11 items-center justify-center rounded-xl", !picture && (preview.mascotBody ?? "cursor") === id ? "bg-ink/[0.08] ring-[1.5px] ring-inset ring-ink/25" : "hover:bg-ink/[0.05]")}
             >
-              <MausAvatar color={preview.color} bodyId={id} size={30} animated={false} trackPointer={false} />
+              <MausAvatar color={preview.color} avatarColor={preview.avatarColor} bodyId={id} size={30} animated={false} trackPointer={false} />
             </button>
           ))}
         </div>

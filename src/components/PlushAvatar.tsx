@@ -6,6 +6,7 @@ import { render, createComponent } from "@solidjs/web";
 import { PlushBot } from "@norbert_bodziony/bloub/plush";
 import type { MausColor, MausState } from "@/lib/mascot";
 import { bloubColor, frozenPose, plushMoodFor, plushProfile } from "@/lib/bloub-profile";
+import { avatarColorHex } from "../../shared/bot-avatar";
 
 const AVATAR_FPS = 30;
 
@@ -13,13 +14,15 @@ export interface PlushAvatarProps {
   /** A stable string per bot (its name/id) — picks the shape and resting eyes. */
   seed: string;
   color: MausColor;
+  /** Custom `#rrggbb` colour overriding the hex from `color`. */
+  avatarColor?: string | null;
   size?: number;
   state?: MausState;
   animated?: boolean;
   title?: string | null;
 }
 
-export function PlushAvatar({ seed, color, size = 44, state, animated = true, title }: PlushAvatarProps) {
+export function PlushAvatar({ seed, color, avatarColor, size = 44, state, animated = true, title }: PlushAvatarProps) {
   const host = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -34,7 +37,7 @@ export function PlushAvatar({ seed, color, size = 44, state, animated = true, ti
     const props: Record<string, unknown> = {
       size,
       shape,
-      color: bloubColor(color),
+      color: avatarColorHex(avatarColor) ?? bloubColor(color),
       expression: eyes,
       state: mood.state,
       eyeScale: 1,
@@ -55,7 +58,7 @@ export function PlushAvatar({ seed, color, size = 44, state, animated = true, ti
       return;
     }
     return () => dispose?.();
-  }, [seed, color, size, state, animated, title]);
+  }, [seed, color, avatarColor, size, state, animated, title]);
 
   return (
     <span

@@ -9,6 +9,17 @@ export function mascotFaceInk(value: unknown): string | undefined {
   return color === "white" ? "#ffffff" : color === "black" ? "#000000" : undefined;
 }
 
+/** A custom `#rrggbb` avatar colour that overrides the hex derived from the named `color` enum. */
+export const avatarColorSchema = z
+  .string()
+  .regex(/^#[0-9a-fA-F]{6}$/, "must be a #rrggbb hex colour");
+
+/** The normalized (lowercase) hex for a custom avatar colour, or undefined when absent/invalid. */
+export function avatarColorHex(value: unknown): string | undefined {
+  const hex = avatarColorSchema.safeParse(value).data;
+  return hex?.toLowerCase();
+}
+
 /**
  * `mascot` draws the animated mascot body, filled with the bot's colour
  * gradient. `circle`, `rounded`, and `square` crop the bot's own image

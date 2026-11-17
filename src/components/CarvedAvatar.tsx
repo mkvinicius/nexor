@@ -13,7 +13,7 @@ import { CARVED_BODIES, type CarvedBody, type CarvedBodyId } from "../../shared/
 import type { CursorAvatarHandle } from "./CursorAvatar";
 import { mascotClock, usePrefersReducedMotion } from "./mascot-clock";
 import { frameFloorMs, nextFrameAt } from "./mascot-motion";
-import { mascotFaceInk, type MascotFaceColor } from "../../shared/bot-avatar";
+import { avatarColorHex, mascotFaceInk, type MascotFaceColor } from "../../shared/bot-avatar";
 
 /** Where the face looks and how it feels. */
 export type CarvedPose = {
@@ -135,16 +135,19 @@ export function vivid(hex: string): string {
   return `#${[ch(h + 1 / 3), ch(h), ch(h - 1 / 3)].map((v) => Math.round(v * 255).toString(16).padStart(2, "0")).join("")}`;
 }
 
-export function carvedFills(body: CarvedBody, color: MausColor): { body: string; accent: string } {
-  const accent = vivid(MAUS_COLORS[color] ?? MAUS_COLORS.green);
+export function carvedFills(body: CarvedBody, color: MausColor, baseHex?: string): { body: string; accent: string } {
+  const base = baseHex ?? MAUS_COLORS[color] ?? MAUS_COLORS.green;
+  const accent = vivid(base);
   if (body.paint === "bone") return { body: body.bone ?? "#f1ede6", accent };
-  if (body.paint === "pale") return { body: mix(MAUS_COLORS[color] ?? MAUS_COLORS.green, "#ffffff", 0.86), accent };
+  if (body.paint === "pale") return { body: mix(base, "#ffffff", 0.86), accent };
   return { body: accent, accent };
 }
 
 export type CarvedAvatarProps = {
   body: CarvedBodyId;
   color: MausColor;
+  /** Custom `#rrggbb` colour overriding the hex derived from `color`. */
+  avatarColor?: string | null;
   faceColor?: MascotFaceColor | null;
   size?: number;
   state?: MausState;
@@ -157,7 +160,7 @@ export type CarvedAvatarProps = {
 };
 
 function CarvedAvatarComponent(
-  { body: bodyId, color, faceColor, size = 44, state = "idle", motion = "none", motionKey = 0, gaze, trackPointer = true, animated = true, label }: CarvedAvatarProps,
+  { body: bodyId, color, avatarColor, faceColor, size = 44, state = "idle", motion = "none", motionKey = 0, gaze, trackPointer = true, animated = true, label }: CarvedAvatarProps,
   ref: React.Ref<CursorAvatarHandle>,
 ) {
   const body = CARVED_BODIES[bodyId];
@@ -266,7 +269,7 @@ function CarvedAvatarComponent(
   };
   const onPointerLeave = () => { cue.current.pointer = null; };
 
-  const fills = carvedFills(body, color);
+  const fills = carvedFills(body, color, avatarColorHex(avatarColor));
   const resolve = (fill: string) => (fill === "body" ? fills.body : fill === "accent" ? fills.accent : fill);
   return (
     <span

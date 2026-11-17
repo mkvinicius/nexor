@@ -137,7 +137,7 @@ export function BotProfileAvatarCard({
                   title={expressionName(expression)}
                   aria-label={t("mascot.useExpression", { expression: expressionName(expression) })}
                 >
-                  <MausAvatar color={bot.color} faceColor={bot.mascotFaceColor} bodyId={bot.mascotBody ?? undefined} state={expression} size={42} animated={false} />
+                  <MausAvatar color={bot.color} avatarColor={bot.avatarColor} faceColor={bot.mascotFaceColor} bodyId={bot.mascotBody ?? undefined} state={expression} size={42} animated={false} />
                 </button>
               ))}
             </div>
@@ -145,23 +145,52 @@ export function BotProfileAvatarCard({
             <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
               {t("botIdentity.color")}
             </div>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               {MAUS_COLOR_NAMES.map((color) => (
                 <button
                   key={color}
                   type="button"
                   disabled={busy}
-                  aria-pressed={bot.color === color}
-                  onClick={() => onPatch({ color })}
+                  aria-pressed={!bot.avatarColor && bot.color === color}
+                  onClick={() => onPatch({ color, avatarColor: null })}
                   className={cn(
                     "size-10 rounded-full border-2 border-transparent transition-transform hover:scale-110 disabled:opacity-50",
-                    bot.color === color && "ring-2 ring-accent-border ring-offset-2 ring-offset-card",
+                    !bot.avatarColor && bot.color === color && "ring-2 ring-accent-border ring-offset-2 ring-offset-card",
                   )}
                   style={{ background: colorSwatch(color) }}
                   title={t(MAUS_COLOR_LABEL[color])}
                   aria-label={t("mascot.useColor", { color: colorName(color) })}
                 />
               ))}
+              <label
+                className={cn(
+                  "relative size-10 cursor-pointer rounded-full border-2 border-transparent transition-transform hover:scale-110",
+                  bot.avatarColor && "ring-2 ring-accent-border ring-offset-2 ring-offset-card",
+                  busy && "pointer-events-none opacity-50",
+                )}
+                style={{ background: bot.avatarColor ?? "conic-gradient(red, orange, yellow, lime, cyan, blue, magenta, red)" }}
+                title="Custom"
+                aria-label="Custom colour"
+              >
+                <input
+                  type="color"
+                  disabled={busy}
+                  value={bot.avatarColor ?? "#888888"}
+                  onChange={(event) => onPatch({ avatarColor: event.target.value })}
+                  className="absolute inset-0 size-full cursor-pointer opacity-0"
+                />
+              </label>
+              {bot.avatarColor && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => onPatch({ avatarColor: null })}
+                  aria-label="Clear custom colour"
+                  className="rounded-md px-2 py-1 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50"
+                >
+                  Clear
+                </button>
+              )}
             </div>
 
             <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
@@ -220,7 +249,7 @@ function BodyButton({ id, name, bot, busy, onPatch }: {
         selected ? "bg-control text-ink" : "text-ink-secondary hover:bg-control/60",
       )}
     >
-      <MausAvatar color={bot.color} faceColor={bot.mascotFaceColor} bodyId={id} size={34} animated={false} trackPointer={false} />
+      <MausAvatar color={bot.color} avatarColor={bot.avatarColor} faceColor={bot.mascotFaceColor} bodyId={id} size={34} animated={false} trackPointer={false} />
     </button>
   );
 }
